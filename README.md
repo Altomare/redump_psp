@@ -5,3 +5,8 @@ This script takes a PSP ISO, and extracts the SFO file information in the same m
 This was made in order to be able to run sfo_info on Linux.
 
 It's still experimental.
+
+# Requirements
+
+- Python 3.4 or superior
+- pycdlib
