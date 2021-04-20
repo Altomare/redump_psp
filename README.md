@@ -1,10 +1,17 @@
-# sfo_info
-Extract SFO info from a PSP ISO
+# PSP ISO Tools for Redump
 
-This script takes a PSP ISO, and extracts the SFO file information in the same manner as the sfo_info.exe tool.
-This was made in order to be able to run sfo_info on Linux.
+This repository contains portable Python replacements for the tools required by Redump when submitting PSP games.
+IsoBuster, Hashcalc and SFOInfo are replaced by the `redump_psp.py` script.
 
-It's still experimental.
+Given an ISO file, it will generate a pre-filled Redump submission, containing:
+- File size
+- Hashes (MD5, CRC32, SHA1)
+- ISO PVD Hexdump
+- SFO information
+
+`sfo_info.py` can be used by itself as a standalone sfo_info.exe replacement that works on Linux too.
+
+
 
 # Requirements
 
