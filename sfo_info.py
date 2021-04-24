@@ -1,6 +1,5 @@
 from io import BytesIO
 import pycdlib
-import os
 import argparse
 import struct
 from enum import IntEnum
@@ -107,10 +106,3 @@ if __name__ == '__main__':
     parser.add_argument('iso', type=str, help='PSP Iso file')
     args = parser.parse_args()
     print(get_sfo_info(args.iso))
-
-
-# Argument, take iso
-# Get hash
-# Get PVD
-# Get SFO Info
-# Print template

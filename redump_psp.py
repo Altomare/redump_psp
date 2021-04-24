@@ -3,8 +3,8 @@ import hashlib
 import os
 import zlib
 
-from .redump_psp_template import TEMPLATE
-from .sfo_info import get_sfo_info
+from redump_psp_template import TEMPLATE
+from sfo_info import get_sfo_info
 
 
 def hexdump(data, print_offset):
@@ -16,6 +16,7 @@ def hexdump(data, print_offset):
             line += f"{data[i * 16 + j]:02X}"
             line += "  " if j == 0x7 else " "
 
+        line += "  "
         r_line = data[i * 0x10: i * 0x10 + 0x10]
         line += "".join([chr(b) if 0x20 <= b <= 0x7F else "." for b in r_line])
         dump += line
@@ -67,6 +68,7 @@ def gen_psp_redump(iso, out):
             f.write(dump)
     else:
         print(dump)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
