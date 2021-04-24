@@ -3,8 +3,8 @@ import hashlib
 import os
 import zlib
 
-from redump_psp_template import TEMPLATE
-from sfo_info import get_sfo_info
+from .redump_psp_template import TEMPLATE
+from .sfo_info import get_sfo_info
 
 
 def hexdump(data, print_offset):
@@ -45,7 +45,7 @@ def gen_hashes(filestream):
             md5.hexdigest())
 
 
-def redump_psp(iso, out):
+def gen_psp_redump(iso, out):
     if not os.path.exists(iso):
         print(f"Unable to access {iso}")
         return
@@ -68,11 +68,11 @@ def redump_psp(iso, out):
     else:
         print(dump)
 
-
-parser = argparse.ArgumentParser(
-    description='Generate pre-filled redump report from a PSP ISO file')
-parser.add_argument('iso', type=str, help='PSP Iso file')
-parser.add_argument('--out', dest='out_file', default=None,
-                    help='output file')
-args = parser.parse_args()
-redump_psp(args.iso, args.out_file)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Generate pre-filled redump report from a PSP ISO file')
+    parser.add_argument('iso', type=str, help='PSP Iso file')
+    parser.add_argument('--out', dest='out_file', default=None,
+                        help='output file')
+    args = parser.parse_args()
+    gen_psp_redump(args.iso, args.out_file)
