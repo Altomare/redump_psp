@@ -39,7 +39,8 @@ class SFO:
 
         self.idx_table = []
         for idx in range(self.header.table_entries):
-            self.idx_table.append(SFOIndexTableEntry(raw_sfo, 0x14 + idx * 0x10))
+            self.idx_table.append(
+                SFOIndexTableEntry(raw_sfo, 0x14 + idx * 0x10))
 
         self.data = {}
         for i in range(len(self.idx_table)):
@@ -94,11 +95,15 @@ def get_sfo_info(path):
             out += f"SFO file: {sfo_file}\n"
             out += sfo.dump() + "\n"
     iso.close()
+
+    if out:
+        out = out[:-2]
     return out
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Extract SFO info from a PSP ISO')
+    parser = argparse.ArgumentParser(
+        description='Extract SFO info from a PSP ISO')
     parser.add_argument('iso', type=str, help='PSP Iso file')
     args = parser.parse_args()
     print(get_sfo_info(args.iso))

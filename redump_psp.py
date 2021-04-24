@@ -9,16 +9,18 @@ from sfo_info import get_sfo_info
 
 def hexdump(data, print_offset):
     dump = ""
-    for i in range(len(data) // 0x10):
+    line_nb = len(data) // 0x10
+    for i in range(line_nb):
         line = f"{print_offset + i * 16:04x} : "
         for j in range(0x10):
             line += f"{data[i * 16 + j]:02X}"
             line += "  " if j == 0x7 else " "
 
-        r_line = data[i * 0x10 : i * 0x10 + 0x10]
+        r_line = data[i * 0x10: i * 0x10 + 0x10]
         line += "".join([chr(b) if 0x20 <= b <= 0x7F else "." for b in r_line])
-
-        dump += line + "\n"
+        dump += line
+        if i < line_nb - 1:
+            dump += "\n"
     return dump
 
 
@@ -42,7 +44,8 @@ def gen_hashes(filestream):
             sha1.hexdigest(),
             md5.hexdigest())
 
-def redump_psp(iso):
+
+def redump_psp(iso, out):
     if not os.path.exists(iso):
         print(f"Unable to access {iso}")
         return
@@ -55,14 +58,21 @@ def redump_psp(iso):
     size_mb = round(size_b / (1024 * 1024))
     sfo_info = get_sfo_info(iso)
 
-    print(TEMPLATE.format(
+    dump = TEMPLATE.format(
         size_mb=size_mb, size_b=size_b,
         md5=hashes[2], sha1=hashes[1], crc32=hashes[0],
-        pvd_hexdump=pvd_dump, sfo_info=sfo_info))
+        pvd_hexdump=pvd_dump, sfo_info=sfo_info)
+    if out:
+        with open(out, 'w', encoding='utf8') as f:
+            f.write(dump)
+    else:
+        print(dump)
 
 
 parser = argparse.ArgumentParser(
     description='Generate pre-filled redump report from a PSP ISO file')
 parser.add_argument('iso', type=str, help='PSP Iso file')
+parser.add_argument('--out', dest='out_file', default=None,
+                    help='output file')
 args = parser.parse_args()
-redump_psp(args.iso)
+redump_psp(args.iso, args.out_file)

@@ -1,5 +1,5 @@
 
-TEMPLATE = """
+TEMPLATE = """\
 General Info:
 [code]
 Game Name:    <FILL_ME>
