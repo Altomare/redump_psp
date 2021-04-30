@@ -41,9 +41,9 @@ def gen_hashes(filestream):
         sha1.update(piece)
         md5.update(piece)
 
-    return (format(prev_crc32 & 0xFFFFFFFF, 'x'),
-            sha1.hexdigest(),
-            md5.hexdigest())
+    return (format(prev_crc32 & 0xFFFFFFFF, 'x').zfill(8),
+            sha1.hexdigest().zfill(40),
+            md5.hexdigest().zfill(32))
 
 
 def gen_psp_redump(iso, out):
