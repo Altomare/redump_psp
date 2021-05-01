@@ -1,6 +1,7 @@
 import argparse
 import hashlib
 import os
+import sys
 import zlib
 
 from redump_psp_template import TEMPLATE
@@ -77,4 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('--out', dest='out_file', default=None,
                         help='output file')
     args = parser.parse_args()
+    if args.out_file and os.path.exists(args.out_file):
+        print("Output file already exists, aborting.")
+        sys.exit(1)
     gen_psp_redump(args.iso, args.out_file)
