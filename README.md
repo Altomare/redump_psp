@@ -104,3 +104,40 @@ TITLE_8: Обновление PSP™ вер. 1.50
 UPDATER_VER: 1.50
 [/code]
 ```
+
+# Using it in other scripts
+
+Since this is just scripts and was not made like a module, some modifications are needed if you want to import the Python code in some bigger project.
+The easiest (and quite ugly) solution is to add a `__init__.py` file, containing:
+```
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".", "."))
+```
+This adds the whole directory to the path, so beware.
+
+Below is a simple script I've made that auto-generates submissions for every ISO in the given directory.
+Make sure it only contains PSP ISOs.
+```Python
+import os
+from redump_psp.redump_psp import gen_psp_redump
+import argparse
+
+parser = argparse.ArgumentParser(
+    description='Find ISOs and generate redump submissions')
+parser.add_argument('dir', type=str, help='Directory')
+args = parser.parse_args()
+
+for root, dirs, files in os.walk(args.dir):
+    for name in files:
+        if not name.endswith('.iso'):
+            continue
+
+        iso_name = name[:-4]
+        if iso_name + '.nfo' in files:
+            continue
+
+        gen_psp_redump(os.path.join(root, iso_name + '.iso'),
+                       os.path.join(root, iso_name + '.nfo'))
+        print(f"Generated submission for {name}")
+```
