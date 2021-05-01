@@ -8,17 +8,16 @@ from redump_psp_template import TEMPLATE
 from sfo_info import get_sfo_info
 
 
-def hexdump(data, print_offset):
+def hexdump(data, offset, size):
     dump = ""
-    line_nb = len(data) // 0x10
+    line_nb = size // 0x10
     for i in range(line_nb):
-        line = f"{print_offset + i * 16:04x} : "
+        line = f"{offset + i * 16:04x} : "
         for j in range(0x10):
-            line += f"{data[i * 16 + j]:02X}"
+            line += f"{data[offset + i * 16 + j]:02X}"
             line += "  " if j == 0x7 else " "
-
         line += "  "
-        r_line = data[i * 0x10: i * 0x10 + 0x10]
+        r_line = data[offset + i * 0x10: offset + i * 0x10 + 0x10]
         line += "".join([chr(b) if 0x20 <= b <= 0x7F else "." for b in r_line])
         dump += line
         if i < line_nb - 1:
@@ -34,6 +33,7 @@ def gen_hashes(filestream):
                 break
             yield data
 
+    filestream.seek(0)
     prev_crc32 = 0
     sha1 = hashlib.sha1()
     md5 = hashlib.md5()
@@ -47,6 +47,16 @@ def gen_hashes(filestream):
             md5.hexdigest().zfill(32))
 
 
+def get_pvd_dump(filestream):
+    filestream.seek(0x8000)
+    raw_sector = filestream.read(0x800)
+    while raw_sector[0] != 0xFF:
+        if raw_sector[6] == 0x1:
+            return hexdump(raw_sector, 0x320, 0x60)
+        raw_sector = filestream.read(0x800)
+    raise Exception("Could not find PVD")
+
+
 def gen_psp_redump(iso, out):
     if not os.path.exists(iso):
         print(f"Unable to access {iso}")
@@ -54,8 +64,7 @@ def gen_psp_redump(iso, out):
 
     with open(iso, 'rb') as f:
         hashes = gen_hashes(f)
-        f.seek(0x800 * 16 + 0x320)  # Go to sector 16 + offset of PVD
-        pvd_dump = hexdump(f.read(0x60), 0x320)
+        pvd_dump = get_pvd_dump(f)
     size_b = os.stat(iso).st_size
     size_mb = round(size_b / (1024 * 1024))
     sfo_info = get_sfo_info(iso)
