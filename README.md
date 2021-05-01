@@ -14,8 +14,17 @@ Given an ISO file, it will generate a pre-filled Redump submission, containing:
 
 # Requirements
 
-- Python 3.4 or superior
+- Python 3 (>= 3.4)
 - pycdlib
+
+Windows exe builds are available in the release tab.
+
+
+# Usage
+
+`redump_psp <iso_file> [--out <output_file>]`
+
+`sfo_info <iso_file>`
 
 
 # Sample output
