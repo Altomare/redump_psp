@@ -37,7 +37,7 @@ def gen_hashes(filestream):
     prev_crc32 = 0
     sha1 = hashlib.sha1()
     md5 = hashlib.md5()
-    for piece in read_in_chunks(filestream, 4096):
+    for piece in read_in_chunks(filestream, 0x10000):
         prev_crc32 = zlib.crc32(piece, prev_crc32)
         sha1.update(piece)
         md5.update(piece)
