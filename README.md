@@ -109,7 +109,7 @@ UPDATER_VER: 1.50
 
 Since this is just scripts and was not made like a module, some modifications are needed if you want to import the Python code in some bigger project.
 The easiest (and quite ugly) solution is to add a `__init__.py` file, containing:
-```
+```Python
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), ".", "."))
