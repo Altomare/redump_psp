@@ -5,7 +5,7 @@ IsoBuster, Hashcalc and SFOInfo are replaced by the `redump_psp.py` script.
 
 Given an ISO file, it will generate a pre-filled Redump submission, containing:
 - File size
-- Hashes (MD5, CRC32, SHA1)
+- Hashes (MD5, CRC32, SHA1, SHA256)
 - ISO PVD Hexdump
 - SFO information
 
@@ -54,9 +54,10 @@ Ring Codes:
 
 HashCalc Info:
 [code]
-MD5:   dd60041bfb6d677fdaacd2cf9cb6d84a
-SHA1:  88a19042041ff368b9cb887432cb5255c654c33c
-CRC32: 83adb164
+MD5:    dd60041bfb6d677fdaacd2cf9cb6d84a
+SHA1:   88a19042041ff368b9cb887432cb5255c654c33c
+CRC32:  83adb164
+SHA256: 7a9a04d89c1867b7f0ce4e9358b78ff52ec0a6612dc3a15511a3aaa5b1ef9cb4 
 [/code]
 
 Primary Volume Descriptor (PVD)
