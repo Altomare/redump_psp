@@ -37,14 +37,17 @@ def gen_hashes(filestream):
     prev_crc32 = 0
     sha1 = hashlib.sha1()
     md5 = hashlib.md5()
+    sha256 = hashlib.sha256()
     for piece in read_in_chunks(filestream, 0x10000):
         prev_crc32 = zlib.crc32(piece, prev_crc32)
         sha1.update(piece)
         md5.update(piece)
+        sha256.update(piece)
 
     return (format(prev_crc32 & 0xFFFFFFFF, 'x').zfill(8),
             sha1.hexdigest().zfill(40),
-            md5.hexdigest().zfill(32))
+            md5.hexdigest().zfill(32),
+            sha256.hexdigest())
 
 
 def get_pvd_dump(filestream):
@@ -71,7 +74,7 @@ def gen_psp_redump(iso, out):
 
     dump = TEMPLATE.format(
         size_mb=size_mb, size_b=size_b,
-        md5=hashes[2], sha1=hashes[1], crc32=hashes[0],
+        md5=hashes[2], sha1=hashes[1], crc32=hashes[0], sha256=hashes[3],
         pvd_hexdump=pvd_dump, sfo_info=sfo_info)
     if out:
         with open(out, 'w', encoding='utf8') as f:

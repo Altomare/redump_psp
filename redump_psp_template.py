@@ -22,9 +22,10 @@ Ring Codes:
 
 HashCalc Info:
 [code]
-MD5:   {md5}
-SHA1:  {sha1}
-CRC32: {crc32}
+MD5:    {md5}
+SHA1:   {sha1}
+CRC32:  {crc32}
+SHA256: {sha256}
 [/code]
 
 Primary Volume Descriptor (PVD)
