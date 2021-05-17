@@ -9,24 +9,23 @@ from sfo_info import get_sfo_info
 
 
 def hexdump(data, offset, size):
+    """Return hexdump string of given data in isobuster format."""
+    def ascii_print(c):
+        return chr(c) if 32 <= c <= 127 else "."
+
     dump = ""
-    line_nb = size // 0x10
-    for i in range(line_nb):
-        line = f"{offset + i * 16:04x} : "
-        for j in range(0x10):
-            line += f"{data[offset + i * 16 + j]:02X}"
-            line += "  " if j == 0x7 else " "
-        line += "  "
-        r_line = data[offset + i * 0x10: offset + i * 0x10 + 0x10]
-        line += "".join([chr(b) if 0x20 <= b <= 0x7F else "." for b in r_line])
-        dump += line
-        if i < line_nb - 1:
-            dump += "\n"
+    for i in range(size // 0x10):
+        line_offset = offset + i * 0x10
+        line_data = data[line_offset: line_offset + 0x10]
+
+        line_format = "{:04X} :" + " {:02X}" * 8 + " " + " {:02X}" * 8
+        dump += line_format.format(line_offset, *line_data)
+        dump += "   " + "".join([ascii_print(b) for b in line_data]) + "\n"
     return dump
 
 
 def gen_hashes(filestream):
-    def read_in_chunks(file_object, chunk_size=1024):
+    def read_in_chunks(file_object, chunk_size):
         while True:
             data = file_object.read(chunk_size)
             if not data:
@@ -47,14 +46,16 @@ def gen_hashes(filestream):
     return (format(prev_crc32 & 0xFFFFFFFF, 'x').zfill(8),
             sha1.hexdigest().zfill(40),
             md5.hexdigest().zfill(32),
-            sha256.hexdigest())
+            sha256.hexdigest().zfill(64))
 
 
 def get_pvd_dump(filestream):
+    # Locate PVD sector, starting from sector 0x10
+    # See: https://wiki.osdev.org/ISO_9660#Volume_Descriptors
     filestream.seek(0x8000)
     raw_sector = filestream.read(0x800)
     while raw_sector[0] != 0xFF:
-        if raw_sector[6] == 0x1:
+        if raw_sector[0] == 0x01:
             return hexdump(raw_sector, 0x320, 0x60)
         raw_sector = filestream.read(0x800)
     raise Exception("Could not find PVD")
@@ -75,7 +76,7 @@ def gen_psp_redump(iso, out):
     dump = TEMPLATE.format(
         size_mb=size_mb, size_b=size_b,
         md5=hashes[2], sha1=hashes[1], crc32=hashes[0], sha256=hashes[3],
-        pvd_hexdump=pvd_dump, sfo_info=sfo_info)
+        pvd_hexdump=pvd_dump.strip('\n'), sfo_info=sfo_info)
     if out:
         with open(out, 'w', encoding='utf8') as f:
             f.write(dump)

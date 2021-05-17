@@ -9,12 +9,12 @@ Given an ISO file, it will generate a pre-filled Redump submission, containing:
 - ISO PVD Hexdump
 - SFO information
 
-`sfo_info.py` can be used by itself as a standalone sfo_info.exe replacement that works on Linux too.
+`sfo_info.py` can be used by itself as a standalone sfo_info.exe replacement.
 
 
 # Requirements
 
-- Python 3 (>= 3.4)
+- Python 3 (>= 3.6)
 - pycdlib
 
 Windows exe builds are available in the release tab.
@@ -57,7 +57,7 @@ HashCalc Info:
 MD5:    dd60041bfb6d677fdaacd2cf9cb6d84a
 SHA1:   88a19042041ff368b9cb887432cb5255c654c33c
 CRC32:  83adb164
-SHA256: 7a9a04d89c1867b7f0ce4e9358b78ff52ec0a6612dc3a15511a3aaa5b1ef9cb4 
+SHA256: c824f63de2f8bf779e73cad524cd3619fc852d8d669fc00f97f110acecb3015d
 [/code]
 
 Primary Volume Descriptor (PVD)
@@ -106,16 +106,7 @@ UPDATER_VER: 1.50
 [/code]
 ```
 
-# Using it in other scripts
-
-Since this is just scripts and was not made like a module, some modifications are needed if you want to import the Python code in some bigger project.
-The easiest (and quite ugly) solution is to add a `__init__.py` file, containing:
-```Python
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), ".", "."))
-```
-This adds the whole directory to the path, so beware.
+# Automating it
 
 Below is a simple script I've made that auto-generates submissions for every ISO in the given directory.
 Make sure it only contains PSP ISOs.
@@ -138,7 +129,8 @@ for root, dirs, files in os.walk(args.dir):
         if iso_name + '.nfo' in files:
             continue
 
+        print(f"Generating submission for {name}...")
         gen_psp_redump(os.path.join(root, iso_name + '.iso'),
                        os.path.join(root, iso_name + '.nfo'))
-        print(f"Generated submission for {name}")
+        print("Done.")
 ```

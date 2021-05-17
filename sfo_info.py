@@ -12,16 +12,6 @@ class SFODataFormat(IntEnum):
     INT32 = 0x0404
 
 
-class SFOHeader:
-    def __init__(self, raw):
-        # Check magic
-        assert(raw[:0x4] == b"\x00PSF")
-        version_minor = struct.unpack("<I", raw[0x5:0x8] + b"\x00")[0]
-        self.version = f"{raw[0x04]}.{version_minor}"
-        self.key_table_start, self.data_table_start, self.table_entries = \
-            struct.unpack('<III', raw[0x08:0x14])
-
-
 class SFOIndexTableEntry:
     def __init__(self, raw, offset):
         fields = struct.unpack('<HHIII', raw[offset: offset + 0x10])
@@ -34,20 +24,28 @@ class SFOIndexTableEntry:
 
 class SFO:
     def __init__(self, raw_sfo):
-        self.header = SFOHeader(raw_sfo)
+        # Read header
+        assert(raw_sfo[:0x4] == b"\x00PSF")
+        version_minor = struct.unpack("<I", raw_sfo[0x5:0x8] + b"\x00")[0]
+        self.version = f"{raw_sfo[0x04]}.{version_minor}"
+        self.key_table_start, self.data_table_start, self.table_entries = \
+            struct.unpack('<III', raw_sfo[0x08:0x14])
 
+        # Read index table entries
         self.idx_table = []
-        for idx in range(self.header.table_entries):
+        for idx in range(self.table_entries):
             self.idx_table.append(
                 SFOIndexTableEntry(raw_sfo, 0x14 + idx * 0x10))
 
+        # Read data entries
         self.data = {}
         for i in range(len(self.idx_table)):
             self._read_entry(raw_sfo, i)
 
     def _read_entry(self, raw_sfo, idx):
-        key_table_start = self.header.key_table_start
-        data_table_start = self.header.data_table_start
+        # Offsets
+        key_table_start = self.key_table_start
+        data_table_start = self.data_table_start
         entry = self.idx_table[idx]
 
         # Read key from key table
@@ -69,8 +67,7 @@ class SFO:
         self.data[key] = data
 
     def dump(self):
-        dump = ""
-        dump += f"SFO Version: {self.header.version}\n"
+        dump = f"SFO Version: {self.version}\n"
         for key in self.data.keys():
             dump += f"{key}: {self.data[key]}\n"
         return dump
@@ -96,7 +93,7 @@ def get_sfo_info(path):
     iso.close()
 
     if out:
-        out = out[:-2]
+        out = out[:-2]  # Strip trailing backlines
     return out
 
 
